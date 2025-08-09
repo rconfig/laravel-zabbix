@@ -334,6 +334,52 @@ Route::get('/zabbix-test', function () {
 });
 ```
 
+Here’s a clean way to add it to your main README so contributors (or future you) know exactly how to cut a release.
+I’d suggest adding a **"Releases"** or **"Publishing"** section at the bottom:
+
+## 📦 Publishing a New Release
+
+We use [Semantic Versioning](https://semver.org/) for all releases.
+
+### 1. Update the Changelog
+
+* Edit `CHANGELOG.md`
+* Add a new section at the top for the version you’re releasing:
+
+```md
+## [0.1.0] - 2025-08-09
+### Added
+- Initial public release of the Laravel Zabbix client.
+```
+
+* Commit the changes:
+
+```bash
+git add CHANGELOG.md
+git commit -m "docs: update changelog for v0.1.0"
+git push origin main
+```
+
+### 2. Tag the Release
+
+Create an annotated Git tag and push it:
+
+```bash
+git tag -a v0.1.0 -m "v0.1.0 initial public release"
+git push origin v0.1.0
+```
+
+### 3. Create the GitHub Release
+
+1. Go to the [GitHub Releases](../../releases) page.
+2. Click **Draft a new release**.
+3. Select the tag you just pushed (`v0.1.0`).
+4. Set the title to match the tag (e.g. `v0.1.0`).
+5. Paste the changelog notes for that version.
+6. Publish the release.
+
+> 💡 **Tip:** If the Packagist webhook is active, the new version will appear there automatically within minutes.
+ 
 ---
 
 ## 🗺️ Roadmap
