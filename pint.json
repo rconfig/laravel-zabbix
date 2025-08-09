@@ -1,0 +1,7 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "blank_line_after_namespace": true,
+        "single_quote": true
+    }
+}

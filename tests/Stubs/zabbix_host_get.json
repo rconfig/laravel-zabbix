@@ -1,0 +1,19 @@
+[
+    {
+        "hostid": "10106",
+        "host": "web-01",
+        "status": 0,
+        "interfaces": [
+            {
+                "ip": "10.0.0.11",
+                "type": 1
+            }
+        ],
+        "groups": [
+            {
+                "groupid": "2",
+                "name": "Linux servers"
+            }
+        ]
+    }
+]

@@ -1,0 +1,75 @@
+{
+    "name": "rconfig/laravel-zabbix",
+    "description": "Laravel-first Zabbix JSON-RPC API client with fluent, testable DX.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.0.1",
+    "keywords": [
+        "laravel",
+        "zabbix",
+        "api",
+        "monitoring",
+        "json-rpc",
+        "fluent",
+        "testing"
+    ],
+    "homepage": "https://github.com/rconfig/laravel-zabbix",
+    "authors": [
+        {
+            "name": "rConfig Devs",
+            "email": "info@rconfig.com",
+            "homepage": "https://www.rconfig.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/rconfig/laravel-zabbix/issues",
+        "source": "https://github.com/rconfig/laravel-zabbix",
+        "docs": "https://github.com/rconfig/laravel-zabbix#readme"
+    },
+    "require": {
+        "php": "^8.2|^8.3|^8.4",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "pestphp/pest": "^3.0",
+        "laravel/pint": "^1.24"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rconfig\\Zabbix\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rconfig\\Zabbix\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint",
+        "format-check": "vendor/bin/pint --test"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Rconfig\\Zabbix\\ZabbixServiceProvider"
+            ],
+            "aliases": {
+                "Zabbix": "Rconfig\\Zabbix\\Facades\\Zabbix"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}
