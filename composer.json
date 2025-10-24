@@ -3,7 +3,7 @@
     "description": "Laravel-first Zabbix JSON-RPC API client with fluent, testable DX.",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": [
         "laravel",
         "zabbix",
@@ -11,7 +11,7 @@
         "monitoring",
         "json-rpc",
         "fluent",
-        "testing"
+        "client"
     ],
     "homepage": "https://github.com/rconfig/laravel-zabbix",
     "authors": [
