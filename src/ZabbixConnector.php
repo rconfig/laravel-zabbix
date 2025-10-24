@@ -8,37 +8,123 @@ use Rconfig\Zabbix\Http\JsonRpcClient;
 
 class ZabbixConnector
 {
+    /**
+     * Get audit logs resource
+     */
+    public function auditLogs(): \Rconfig\Zabbix\Resources\AuditLogs
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\AuditLogs($this->client);
+    }
+
+    /**
+     * Get autoregistrations resource
+     */
+    public function autoregistrations(): \Rconfig\Zabbix\Resources\Autoregistrations
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Autoregistrations($this->client);
+    }
+
+    /**
+     * Get configurations resource
+     */
+    public function configurations(): \Rconfig\Zabbix\Resources\Configurations
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Configurations($this->client);
+    }
+
+    /**
+     * Get correlations resource
+     */
+    public function correlations(): \Rconfig\Zabbix\Resources\Correlations
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Correlations($this->client);
+    }
+
+    /**
+     * Get discovered hosts resource
+     */
+    public function discoveredHosts(): \Rconfig\Zabbix\Resources\DiscoveredHosts
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\DiscoveredHosts($this->client);
+    }
+
+    /**
+     * Get discovered services resource
+     */
+    public function discoveredServices(): \Rconfig\Zabbix\Resources\DiscoveredServices
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\DiscoveredServices($this->client);
+    }
+
+    /**
+     * Get high availability nodes resource
+     */
+    public function highAvailabilityNodes(): \Rconfig\Zabbix\Resources\HighAvailabilityNodes
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\HighAvailabilityNodes($this->client);
+    }
+
+    /**
+     * Get histories resource
+     */
+    public function histories(): \Rconfig\Zabbix\Resources\Histories
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Histories($this->client);
+    }
+
+    /**
+     * Get maintenances resource
+     */
+    public function maintenances(): \Rconfig\Zabbix\Resources\Maintenances
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Maintenances($this->client);
+    }
+
+    /**
+     * Get problems resource
+     */
+    public function problems(): \Rconfig\Zabbix\Resources\Problems
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Problems($this->client);
+    }
+
+    /**
+     * Get tokens resource
+     */
+
+    public function tokens(): \Rconfig\Zabbix\Resources\Tokens
+    {
+        $this->ensureLoggedIn();
+        return new \Rconfig\Zabbix\Resources\Tokens($this->client);
+    }
+
+    // --- Properties ---
     protected ?ZabbixClient $client = null;
-
     protected ?string $baseUrl = null;
-
     protected ?string $endpoint = null;
-
     protected ?string $username = null;
-
     protected ?string $password = null;
-
     protected ?string $token = null;
-
     protected bool $isLoggedIn = false;
-
     // Additional options properties
     protected bool $debug = false;
-
     protected ?string $sslCaFile = null;
-
     protected int $sslVerifyPeer = 1;
-
     protected int $sslVerifyHost = 2;
-
     protected bool $useGzip = true;
-
     protected int $timeout = 30;
-
     protected int $connectTimeout = 30;
-
     protected int $retries = 2;
-
     protected int $retrySleepMs = 250;
 
     /**
@@ -63,8 +149,13 @@ class ZabbixConnector
         $this->password = $password ?? config('zabbix.password');
         $this->token = $options['token'] ?? config('zabbix.token');
 
+        // FIXED: Clean up the token - treat empty string as null
+        if (empty($this->token)) {
+            $this->token = null;
+        }
+
         // Validate we have either token or username/password
-        if (empty($this->token) && (empty($this->username) || empty($this->password))) {
+        if ($this->token === null && (empty($this->username) || empty($this->password))) {
             throw new ZabbixException('No valid credentials provided. Either provide token or username/password, or configure them in config/zabbix.php');
         }
 
@@ -73,11 +164,17 @@ class ZabbixConnector
             throw new ZabbixException('No Zabbix base URL provided. Either pass it to login() or configure ZABBIX_BASE_URL in your .env file');
         }
 
-        // Ensure URL doesn't end with slash for consistency
-        $this->baseUrl = rtrim($this->baseUrl, '/');
+        // Clean and prepare the URL (remove endpoints, trailing slashes, etc.)
+        $this->baseUrl = $this->prepareUrl($this->baseUrl);
 
-        // Create the JSON-RPC client with enhanced options
-        $hasToken = ! empty($this->token);
+        // Debug output after credentials are set
+        if ($this->debug) {
+            dump("DBG login(). Using zabUser: " . ($this->username ?? 'N/A') . ", zabUrl: " . $this->baseUrl . "\n");
+            dump("DBG login(). Library Version: ZabbixConnector v1.0\n");
+        }
+
+        // FIXED: Create the JSON-RPC client with proper token detection
+        $hasToken = $this->token !== null;
 
         $this->client = new JsonRpcClient(
             baseUrl: $this->baseUrl,
@@ -97,7 +194,7 @@ class ZabbixConnector
             $this->apiVersion();
             $this->isLoggedIn = true;
         } catch (\Exception $e) {
-            throw new ZabbixException('Failed to connect to Zabbix API: '.$e->getMessage(), previous: $e);
+            throw new ZabbixException('Failed to connect to Zabbix API: ' . $e->getMessage(), previous: $e);
         }
 
         return $this;
@@ -161,8 +258,8 @@ class ZabbixConnector
         }
 
         if ($this->debug) {
-            echo "DBG login(). Using zabUser: {$this->username}, zabUrl: {$this->baseUrl}\n";
-            echo "DBG login(). Library Version: ZabbixConnector v1.0\n";
+            dump("DBG login(). Using zabUser: {$this->username}, zabUrl: {$this->baseUrl}\n");
+            dump("DBG login(). Library Version: ZabbixConnector v1.0\n");
         }
 
         if (array_key_exists('sslCaFile', $options)) {
@@ -201,7 +298,7 @@ class ZabbixConnector
         }
 
         if ($this->debug) {
-            echo "DBG login(). Using sslVerifyPeer: {$this->sslVerifyPeer} sslVerifyHost: {$this->sslVerifyHost} useGzip: {$this->useGzip} timeout: {$this->timeout} connectTimeout: {$this->connectTimeout}\n";
+            dump("DBG login(). Using sslVerifyPeer: {$this->sslVerifyPeer} sslVerifyHost: {$this->sslVerifyHost} useGzip: {$this->useGzip} timeout: {$this->timeout} connectTimeout: {$this->connectTimeout}\n");
         }
     }
 
@@ -288,26 +385,6 @@ class ZabbixConnector
     }
 
     /**
-     * Get maintenances resource
-     */
-    public function maintenances(): \Rconfig\Zabbix\Resources\Maintenances
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Maintenances($this->client);
-    }
-
-    /**
-     * Get problems resource
-     */
-    public function problems(): \Rconfig\Zabbix\Resources\Problems
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Problems($this->client);
-    }
-
-    /**
      * Get templates resource
      */
     public function templates(): \Rconfig\Zabbix\Resources\Templates
@@ -315,116 +392,6 @@ class ZabbixConnector
         $this->ensureLoggedIn();
 
         return new \Rconfig\Zabbix\Resources\Templates($this->client);
-    }
-
-    /**
-     * Get actions resource
-     */
-    public function actions(): \Rconfig\Zabbix\Resources\Actions
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Actions($this->client);
-    }
-
-    /**
-     * Get alerts resource
-     */
-    public function alerts(): \Rconfig\Zabbix\Resources\Alerts
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Alerts($this->client);
-    }
-
-    /**
-     * Get audit logs resource
-     */
-    public function auditLogs(): \Rconfig\Zabbix\Resources\AuditLogs
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\AuditLogs($this->client);
-    }
-
-    /**
-     * Get autoregistrations resource
-     */
-    public function autoregistrations(): \Rconfig\Zabbix\Resources\Autoregistrations
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Autoregistrations($this->client);
-    }
-
-    /**
-     * Get configurations resource
-     */
-    public function configurations(): \Rconfig\Zabbix\Resources\Configurations
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Configurations($this->client);
-    }
-
-    /**
-     * Get connectors resource
-     */
-    public function connectors(): \Rconfig\Zabbix\Resources\Connectors
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Connectors($this->client);
-    }
-
-    /**
-     * Get correlations resource
-     */
-    public function correlations(): \Rconfig\Zabbix\Resources\Correlations
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Correlations($this->client);
-    }
-
-    /**
-     * Get dashboards resource
-     */
-    public function dashboards(): \Rconfig\Zabbix\Resources\Dashboards
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Dashboards($this->client);
-    }
-
-    /**
-     * Get events resource
-     */
-    public function events(): \Rconfig\Zabbix\Resources\Events
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Events($this->client);
-    }
-
-    /**
-     * Get histories resource
-     */
-    public function histories(): \Rconfig\Zabbix\Resources\Histories
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Histories($this->client);
-    }
-
-    /**
-     * Get tokens resource
-     */
-    public function tokens(): \Rconfig\Zabbix\Resources\Tokens
-    {
-        $this->ensureLoggedIn();
-
-        return new \Rconfig\Zabbix\Resources\Tokens($this->client);
     }
 
     /**
@@ -458,23 +425,83 @@ class ZabbixConnector
     }
 
     /**
-     * Get discovered hosts resource
+     * Get actions resource
      */
-    public function discoveredHosts(): \Rconfig\Zabbix\Resources\DiscoveredHosts
+    public function actions(): \Rconfig\Zabbix\Resources\Actions
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\DiscoveredHosts($this->client);
+        return new \Rconfig\Zabbix\Resources\Actions($this->client);
     }
 
     /**
-     * Get discovered services resource
+     * Get alerts resource
      */
-    public function discoveredServices(): \Rconfig\Zabbix\Resources\DiscoveredServices
+    public function alerts(): \Rconfig\Zabbix\Resources\Alerts
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\DiscoveredServices($this->client);
+        return new \Rconfig\Zabbix\Resources\Alerts($this->client);
+    }
+
+    /**
+     * Get authentication resource
+     */
+    public function authentication(): \Rconfig\Zabbix\Resources\Authentication
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Authentication($this->client);
+    }
+
+    /**
+     * Get auto registration resource
+     */
+    public function autoRegistration(): \Rconfig\Zabbix\Resources\AutoRegistration
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\AutoRegistration($this->client);
+    }
+
+    /**
+     * Get configuration resource
+     */
+    public function configuration(): \Rconfig\Zabbix\Resources\Configuration
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Configuration($this->client);
+    }
+
+    /**
+     * Get connectors resource
+     */
+    public function connectors(): \Rconfig\Zabbix\Resources\Connectors
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Connectors($this->client);
+    }
+
+    /**
+     * Get correlation resource
+     */
+    public function correlation(): \Rconfig\Zabbix\Resources\Correlation
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Correlation($this->client);
+    }
+
+    /**
+     * Get dashboards resource
+     */
+    public function dashboards(): \Rconfig\Zabbix\Resources\Dashboards
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Dashboards($this->client);
     }
 
     /**
@@ -498,6 +525,26 @@ class ZabbixConnector
     }
 
     /**
+     * Get events resource
+     */
+    public function events(): \Rconfig\Zabbix\Resources\Events
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Events($this->client);
+    }
+
+    /**
+     * Get graphs resource
+     */
+    public function graphs(): \Rconfig\Zabbix\Resources\Graphs
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Graphs($this->client);
+    }
+
+    /**
      * Get graph items resource
      */
     public function graphItems(): \Rconfig\Zabbix\Resources\GraphItems
@@ -518,23 +565,23 @@ class ZabbixConnector
     }
 
     /**
-     * Get graphs resource
+     * GetHA nodes resource
      */
-    public function graphs(): \Rconfig\Zabbix\Resources\Graphs
+    public function haNodes(): \Rconfig\Zabbix\Resources\HANodes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Graphs($this->client);
+        return new \Rconfig\Zabbix\Resources\HANodes($this->client);
     }
 
     /**
-     * Get high availability nodes resource
+     * Get history resource
      */
-    public function highAvailabilityNodes(): \Rconfig\Zabbix\Resources\HighAvailabilityNodes
+    public function history(): \Rconfig\Zabbix\Resources\History
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HighAvailabilityNodes($this->client);
+        return new \Rconfig\Zabbix\Resources\History($this->client);
     }
 
     /**
@@ -605,6 +652,16 @@ class ZabbixConnector
         $this->ensureLoggedIn();
 
         return new \Rconfig\Zabbix\Resources\LLDRules($this->client);
+    }
+
+    /**
+     * Get maintenance resource
+     */
+    public function maintenance(): \Rconfig\Zabbix\Resources\Maintenance
+    {
+        $this->ensureLoggedIn();
+
+        return new \Rconfig\Zabbix\Resources\Maintenance($this->client);
     }
 
     /**
@@ -882,5 +939,32 @@ class ZabbixConnector
         $this->username = null;
         $this->password = null;
         $this->token = null;
+    }
+
+    /**
+     * Clean and prepare the URL for Zabbix API
+     * Removes common Zabbix API endpoints and trailing slashes
+     */
+    private function prepareUrl(string $url): string
+    {
+        // Remove trailing slash
+        $url = rtrim($url, '/');
+
+        // Remove common Zabbix API endpoints if they exist
+        $endpoints = [
+            '/api_jsonrpc.php',
+            '/zabbix/api_jsonrpc.php',
+            '/frontend/api_jsonrpc.php',  // Some custom installations
+            '/web/api_jsonrpc.php',       // Some custom installations
+        ];
+
+        foreach ($endpoints as $endpoint) {
+            if (str_ends_with($url, $endpoint)) {
+                $url = str_replace($endpoint, '', $url);
+                break;
+            }
+        }
+
+        return $url;
     }
 }

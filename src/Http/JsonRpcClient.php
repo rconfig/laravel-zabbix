@@ -32,14 +32,14 @@ class JsonRpcClient implements ZabbixClient
             'id' => $this->id++,
         ];
 
-        // never include legacy auth for apiinfo.version
+        // Never include legacy auth for apiinfo.version
         if ($this->shouldUseLegacyAuth($method)) {
             $this->ensureSessionToken($method);
             $body['auth'] = $this->authToken;
         }
 
         try {
-            $res = $this->request($method)->post($this->baseUrl.$this->endpoint, $body)->throw();
+            $res = $this->request($method)->post($this->baseUrl . $this->endpoint, $body)->throw();
         } catch (\Illuminate\Http\Client\RequestException $e) {
             throw new \Rconfig\Zabbix\Exceptions\ZabbixHttpException($e->getMessage(), previous: $e);
         }
@@ -61,7 +61,7 @@ class JsonRpcClient implements ZabbixClient
             ->retry($this->retries, $this->retrySleepMs);
 
         // Apply SSL options if provided
-        if (! empty($this->sslOptions)) {
+        if (!empty($this->sslOptions)) {
             $req = $req->withOptions($this->sslOptions);
         }
 
@@ -81,24 +81,37 @@ class JsonRpcClient implements ZabbixClient
         return ! $this->hasBearerToken && $method !== 'user.login' && $method !== 'apiinfo.version';
     }
 
+    /**
+     * FIXED: Ensure we have a session token for legacy auth (username/password)
+     * This method is called before making API calls that require authentication
+     */
     protected function ensureSessionToken(string $method): void
     {
-        if ($this->authToken || ! $this->username || ! $this->password) {
+        // If we already have a token, we're good - just return
+        if ($this->authToken) {
             return;
         }
 
+        // If we don't have credentials, we can't login
+        if (! $this->username || ! $this->password) {
+            throw new \Rconfig\Zabbix\Exceptions\ZabbixException('Missing legacy credentials for authentication.');
+        }
+
+        // Perform the login to get a session token
         $login = [
             'jsonrpc' => '2.0',
             'method' => 'user.login',
-            'params' => ['user' => $this->username, 'password' => $this->password],
+            'params' => ['username' => $this->username, 'password' => $this->password],
             'id' => $this->id++,
         ];
 
-        // user.login call should NOT carry Authorization either
-        $res = $this->request($method)->post($this->baseUrl.$this->endpoint, $login)->throw()->json();
+        // user.login call should NOT carry Authorization header
+        $res = $this->request($method)->post($this->baseUrl . $this->endpoint, $login)->throw()->json();
+
         if (! isset($res['result'])) {
             throw new \Rconfig\Zabbix\Exceptions\ZabbixException('Unable to authenticate with legacy credentials.');
         }
+
         $this->authToken = $res['result'];
     }
 }
