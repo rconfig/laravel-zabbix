@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists problems', function () {
-    $problems = Zabbix::problems()->get(['recent' => 'true', 'limit' => 5]);
+    ZabbixApi::login();
+    $problems = ZabbixApi::problems()->get(['recent' => 'true', 'limit' => 5]);
     expect($problems)->toBeArray();
 });

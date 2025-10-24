@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists host prototypes', function () {
-    $res = Zabbix::hostPrototypes()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::hostPrototypes()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

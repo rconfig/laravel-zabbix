@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists discovery checks', function () {
-    $res = Zabbix::discoveryChecks()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::discoveryChecks()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

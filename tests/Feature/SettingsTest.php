@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('gets settings', function () {
-    $res = Zabbix::settings()->get([]);
+    ZabbixApi::login();
+    $res = ZabbixApi::settings()->get([]);
     expect($res)->toBeArray();
 });

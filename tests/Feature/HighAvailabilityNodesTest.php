@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists HA nodes', function () {
-    $res = Zabbix::highAvailabilityNodes()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::highAvailabilityNodes()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

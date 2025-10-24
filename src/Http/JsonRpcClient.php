@@ -20,6 +20,7 @@ class JsonRpcClient implements ZabbixClient
         protected int $retries = 2,
         protected int $retrySleepMs = 250,
         protected ?string $bearer = null,
+        protected array $sslOptions = [],
     ) {}
 
     public function call(string $method, array $params): mixed
@@ -58,6 +59,11 @@ class JsonRpcClient implements ZabbixClient
     {
         $req = \Illuminate\Support\Facades\Http::timeout($this->timeout)
             ->retry($this->retries, $this->retrySleepMs);
+
+        // Apply SSL options if provided
+        if (! empty($this->sslOptions)) {
+            $req = $req->withOptions($this->sslOptions);
+        }
 
         // Do NOT send Authorization header for apiinfo.version
         $skipBearer = ($method === 'apiinfo.version');

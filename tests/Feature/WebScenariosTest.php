@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists web scenarios', function () {
-    $res = Zabbix::webScenarios()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::webScenarios()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

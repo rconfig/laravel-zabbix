@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists templates', function () {
-    $tpl = Zabbix::templates()->get(['output' => ['templateid', 'host']]);
+    ZabbixApi::login();
+    $tpl = ZabbixApi::templates()->get(['output' => ['templateid', 'host']]);
     expect($tpl)->toBeArray();
 });

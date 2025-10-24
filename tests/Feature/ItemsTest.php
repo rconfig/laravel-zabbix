@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists items', function () {
-    $items = Zabbix::items()->get(['hostids' => ['10106'], 'output' => ['itemid', 'name']]);
+    ZabbixApi::login();
+    $items = ZabbixApi::items()->get(['hostids' => ['10106'], 'output' => ['itemid', 'name']]);
     expect($items)->toBeArray()->not->toBeEmpty();
 });

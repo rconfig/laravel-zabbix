@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists regular expressions', function () {
-    $res = Zabbix::regularExpressions()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::regularExpressions()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

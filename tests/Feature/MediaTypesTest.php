@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists media types', function () {
-    $res = Zabbix::mediaTypes()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::mediaTypes()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

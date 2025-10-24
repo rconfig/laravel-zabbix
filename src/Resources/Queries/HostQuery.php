@@ -33,4 +33,11 @@ class HostQuery extends FluentQuery
 
         return $this;
     }
+
+    public function countOnly(): static
+    {
+        $this->params['countOutput'] = true;
+
+        return $this;
+    }
 }

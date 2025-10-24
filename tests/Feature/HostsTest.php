@@ -1,10 +1,11 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('fetches hosts via fluent query', function () {
-    $hosts = Zabbix::hosts()->get(
-        Zabbix::hosts()->query()
+    ZabbixApi::login();
+    $hosts = ZabbixApi::hosts()->get(
+        ZabbixApi::hosts()->query()
             ->select(['hostid', 'host', 'status'])
             ->withInterfaces()
             ->withGroups()
@@ -17,6 +18,7 @@ it('fetches hosts via fluent query', function () {
 });
 
 it('gets api version', function () {
-    $ver = Zabbix::apiVersion();
+    ZabbixApi::login();
+    $ver = ZabbixApi::apiVersion();
     expect($ver)->toBeString()->and($ver)->toMatch('/^\d+\.\d+/');
 });

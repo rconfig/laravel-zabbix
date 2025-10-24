@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists connectors', function () {
-    $res = Zabbix::connectors()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::connectors()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('gets tokens (fake)', function () {
-    $t = Zabbix::tokens()->get(['output' => 'extend', 'limit' => 2]);
+    ZabbixApi::login();
+    $t = ZabbixApi::tokens()->get(['output' => 'extend', 'limit' => 2]);
     expect($t)->toBeArray();
 });

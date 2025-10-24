@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists alerts', function () {
-    $res = Zabbix::alerts()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::alerts()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

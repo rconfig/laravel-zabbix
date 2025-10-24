@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists autoregistrations', function () {
-    $res = Zabbix::autoregistrations()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::autoregistrations()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });
