@@ -513,7 +513,7 @@ While we aren't directly affiliated with Zabbix or Laravel, but we follow their 
 
 ## Authors
 
-This library is created by rConfig Developers.
+This library is created by rConfig Developers for the Zabbix and Laravel communities.
 
 ## License
 
