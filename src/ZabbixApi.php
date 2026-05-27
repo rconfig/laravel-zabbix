@@ -5,6 +5,12 @@ namespace Rconfig\Zabbix;
 use Rconfig\Zabbix\Contracts\ZabbixClient;
 use Rconfig\Zabbix\Exceptions\ZabbixException;
 use Rconfig\Zabbix\Http\JsonRpcClient;
+use Rconfig\Zabbix\Resources\HostGroups;
+use Rconfig\Zabbix\Resources\Hosts;
+use Rconfig\Zabbix\Resources\Items;
+use Rconfig\Zabbix\Resources\Maintenances;
+use Rconfig\Zabbix\Resources\Problems;
+use Rconfig\Zabbix\Resources\Templates;
 
 class ZabbixApi
 {
@@ -136,61 +142,61 @@ class ZabbixApi
     /**
      * Get hosts resource
      */
-    public function hosts(): \Rconfig\Zabbix\Resources\Hosts
+    public function hosts(): Hosts
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Hosts($this->client);
+        return new Hosts($this->client);
     }
 
     /**
      * Get host groups resource
      */
-    public function hostGroups(): \Rconfig\Zabbix\Resources\HostGroups
+    public function hostGroups(): HostGroups
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HostGroups($this->client);
+        return new HostGroups($this->client);
     }
 
     /**
      * Get items resource
      */
-    public function items(): \Rconfig\Zabbix\Resources\Items
+    public function items(): Items
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Items($this->client);
+        return new Items($this->client);
     }
 
     /**
      * Get maintenances resource
      */
-    public function maintenances(): \Rconfig\Zabbix\Resources\Maintenances
+    public function maintenances(): Maintenances
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Maintenances($this->client);
+        return new Maintenances($this->client);
     }
 
     /**
      * Get problems resource
      */
-    public function problems(): \Rconfig\Zabbix\Resources\Problems
+    public function problems(): Problems
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Problems($this->client);
+        return new Problems($this->client);
     }
 
     /**
      * Get templates resource
      */
-    public function templates(): \Rconfig\Zabbix\Resources\Templates
+    public function templates(): Templates
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Templates($this->client);
+        return new Templates($this->client);
     }
 
     /**

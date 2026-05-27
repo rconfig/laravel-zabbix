@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Http;
+use Rconfig\Zabbix\Exceptions\ZabbixException;
 use Rconfig\Zabbix\Http\JsonRpcClient;
 
 it('can create JsonRpcClient with SSL options', function () {
@@ -61,7 +62,7 @@ it('builds correct endpoint variations for root URL', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 
@@ -78,7 +79,7 @@ it('builds correct endpoint variations for URL with /zabbix path', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 
@@ -94,7 +95,7 @@ it('builds correct endpoint variations for URL with custom path', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 
@@ -111,7 +112,7 @@ it('builds correct endpoint variations for URL with port', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 
@@ -128,7 +129,7 @@ it('builds correct endpoint variations for full api_jsonrpc.php URL', function (
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 
@@ -144,7 +145,7 @@ it('discovers endpoint successfully with modern Zabbix 7.2 root endpoint', funct
         'https://zabbix72.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.2.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -156,7 +157,7 @@ it('discovers endpoint successfully with modern Zabbix 7.2 root endpoint', funct
     $endpoint = $client->getFullEndpointUrl();
 
     expect($endpoint)->toBe('https://zabbix72.example.com/api_jsonrpc.php');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('discovers endpoint by trying /zabbix path when root fails', function () {
     Http::fake([
@@ -164,7 +165,7 @@ it('discovers endpoint by trying /zabbix path when root fails', function () {
         'https://legacy.example.com/zabbix/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '6.0.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -176,7 +177,7 @@ it('discovers endpoint by trying /zabbix path when root fails', function () {
     $endpoint = $client->getFullEndpointUrl();
 
     expect($endpoint)->toBe('https://legacy.example.com/zabbix/api_jsonrpc.php');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('throws exception when no endpoint can be discovered', function () {
     Http::fake([
@@ -188,16 +189,16 @@ it('throws exception when no endpoint can be discovered', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    expect(fn() => $client->getFullEndpointUrl())
-        ->toThrow(\Rconfig\Zabbix\Exceptions\ZabbixException::class, 'Could not discover Zabbix API endpoint');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+    expect(fn () => $client->getFullEndpointUrl())
+        ->toThrow(ZabbixException::class, 'Could not discover Zabbix API endpoint');
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('caches discovered endpoint to avoid multiple discovery attempts', function () {
     Http::fake([
         'https://cache-test.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.2.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -217,7 +218,7 @@ it('caches discovered endpoint to avoid multiple discovery attempts', function (
     // Should only make one HTTP request for discovery
     $recorded = Http::recorded();
     expect(count($recorded))->toBe(1);
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 // ============================================================================
 // API Version Detection Tests (Zabbix 7.2+ auth detection)
@@ -228,7 +229,7 @@ it('detects API version 7.2 and enables header auth', function () {
         'https://v72.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.2.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -242,14 +243,14 @@ it('detects API version 7.2 and enables header auth', function () {
 
     expect($version)->toBe('7.2.0')
         ->and($info['uses_header_auth'])->toBeTrue();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('detects API version 7.0 and enables header auth', function () {
     Http::fake([
         'https://v70.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.0.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -263,14 +264,14 @@ it('detects API version 7.0 and enables header auth', function () {
 
     expect($version)->toBe('7.0.0')
         ->and($info['uses_header_auth'])->toBeTrue();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('detects API version 6.4 and enables header auth', function () {
     Http::fake([
         'https://v64.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '6.4.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -284,14 +285,14 @@ it('detects API version 6.4 and enables header auth', function () {
 
     expect($version)->toBe('6.4.0')
         ->and($info['uses_header_auth'])->toBeTrue();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('detects API version 6.0 and disables header auth', function () {
     Http::fake([
         'https://v60.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '6.0.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -305,14 +306,14 @@ it('detects API version 6.0 and disables header auth', function () {
 
     expect($version)->toBe('6.0.0')
         ->and($info['uses_header_auth'])->toBeFalse();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('detects API version 5.4 and disables header auth', function () {
     Http::fake([
         'https://v54.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '5.4.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -326,14 +327,14 @@ it('detects API version 5.4 and disables header auth', function () {
 
     expect($version)->toBe('5.4.0')
         ->and($info['uses_header_auth'])->toBeFalse();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('provides endpoint info including discovered endpoint and version', function () {
     Http::fake([
         'https://info.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.2.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -352,7 +353,7 @@ it('provides endpoint info including discovered endpoint and version', function 
         ->and($info['discovered_endpoint'])->toBe('https://info.example.com/api_jsonrpc.php')
         ->and($info['api_version'])->toBe('7.2.0')
         ->and($info['uses_header_auth'])->toBeTrue();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 // ============================================================================
 // Authentication Method Tests (Header vs Body)
@@ -397,7 +398,7 @@ it('uses authorization header for Zabbix 7.2+ with session token', function () {
     expect($result)->toBeArray()
         ->and($authHeaderUsed)->toBeTrue()
         ->and($authInBodyUsed)->toBeFalse();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('uses auth in body for Zabbix 6.0 with session token', function () {
     $authHeaderUsed = false;
@@ -441,7 +442,7 @@ it('uses auth in body for Zabbix 6.0 with session token', function () {
         ->and($authHeaderUsed)->toBeFalse()
         ->and($authInBodyUsed)->toBeTrue()
         ->and($tokenValue)->toBe('test-auth-token-60');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('uses bearer token in authorization header when configured', function () {
     $bearerTokenUsed = false;
@@ -478,7 +479,7 @@ it('uses bearer token in authorization header when configured', function () {
     expect($result)->toBeArray()
         ->and($bearerTokenUsed)->toBeTrue()
         ->and($authHeaderValue)->toContain('Bearer my-bearer-token-123');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('does not send auth for apiinfo.version method', function () {
     $authHeaderUsed = false;
@@ -511,7 +512,7 @@ it('does not send auth for apiinfo.version method', function () {
     expect($version)->toBe('7.2.0')
         ->and($authHeaderUsed)->toBeFalse()
         ->and($authInBodyUsed)->toBeFalse();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('does not send auth for user.login method', function () {
     $authHeaderUsedForLogin = false;
@@ -526,6 +527,7 @@ it('does not send auth for user.login method', function () {
 
             if ($body['method'] === 'user.login') {
                 $authHeaderUsedForLogin = $request->hasHeader('Authorization');
+
                 return Http::response(['jsonrpc' => '2.0', 'result' => 'test-token', 'id' => 1], 200);
             }
 
@@ -544,7 +546,7 @@ it('does not send auth for user.login method', function () {
 
     expect($result)->toBeArray()
         ->and($authHeaderUsedForLogin)->toBeFalse();
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 // ============================================================================
 // URL Normalization and Edge Cases
@@ -555,7 +557,7 @@ it('handles URL with trailing slash correctly', function () {
         'https://slash.example.com/api_jsonrpc.php' => Http::response([
             'jsonrpc' => '2.0',
             'result' => '7.2.0',
-            'id' => 1
+            'id' => 1,
         ], 200),
     ]);
 
@@ -567,7 +569,7 @@ it('handles URL with trailing slash correctly', function () {
     $endpoint = $client->getFullEndpointUrl();
 
     expect($endpoint)->toContain('https://slash.example.com');
-})->skip(!env('RUN_ZABBIX_INTEGRATION'));
+})->skip(! env('RUN_ZABBIX_INTEGRATION'));
 
 it('handles URL without scheme correctly', function () {
     $client = new JsonRpcClient(
@@ -575,7 +577,7 @@ it('handles URL without scheme correctly', function () {
         endpoint: '/api_jsonrpc.php'
     );
 
-    $reflection = new \ReflectionClass($client);
+    $reflection = new ReflectionClass($client);
     $method = $reflection->getMethod('buildEndpointVariations');
     $method->setAccessible(true);
 

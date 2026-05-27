@@ -5,126 +5,215 @@ namespace Rconfig\Zabbix;
 use Rconfig\Zabbix\Contracts\ZabbixClient;
 use Rconfig\Zabbix\Exceptions\ZabbixException;
 use Rconfig\Zabbix\Http\JsonRpcClient;
+use Rconfig\Zabbix\Resources\Actions;
+use Rconfig\Zabbix\Resources\Alerts;
+use Rconfig\Zabbix\Resources\AuditLogs;
+use Rconfig\Zabbix\Resources\Authentication;
+use Rconfig\Zabbix\Resources\AutoRegistration;
+use Rconfig\Zabbix\Resources\Autoregistrations;
+use Rconfig\Zabbix\Resources\Configuration;
+use Rconfig\Zabbix\Resources\Configurations;
+use Rconfig\Zabbix\Resources\Connectors;
+use Rconfig\Zabbix\Resources\Correlation;
+use Rconfig\Zabbix\Resources\Correlations;
+use Rconfig\Zabbix\Resources\Dashboards;
+use Rconfig\Zabbix\Resources\DiscoveredHosts;
+use Rconfig\Zabbix\Resources\DiscoveredServices;
+use Rconfig\Zabbix\Resources\DiscoveryChecks;
+use Rconfig\Zabbix\Resources\DiscoveryRules;
+use Rconfig\Zabbix\Resources\Events;
+use Rconfig\Zabbix\Resources\GraphItems;
+use Rconfig\Zabbix\Resources\GraphPrototypes;
+use Rconfig\Zabbix\Resources\Graphs;
+use Rconfig\Zabbix\Resources\HANodes;
+use Rconfig\Zabbix\Resources\HighAvailabilityNodes;
+use Rconfig\Zabbix\Resources\Histories;
+use Rconfig\Zabbix\Resources\History;
+use Rconfig\Zabbix\Resources\HostGroups;
+use Rconfig\Zabbix\Resources\HostInterfaces;
+use Rconfig\Zabbix\Resources\HostPrototypes;
+use Rconfig\Zabbix\Resources\Hosts;
+use Rconfig\Zabbix\Resources\Housekeeping;
+use Rconfig\Zabbix\Resources\IconMaps;
+use Rconfig\Zabbix\Resources\Images;
+use Rconfig\Zabbix\Resources\ItemPrototypes;
+use Rconfig\Zabbix\Resources\Items;
+use Rconfig\Zabbix\Resources\LLDRules;
+use Rconfig\Zabbix\Resources\Maintenance;
+use Rconfig\Zabbix\Resources\Maintenances;
+use Rconfig\Zabbix\Resources\Maps;
+use Rconfig\Zabbix\Resources\MediaTypes;
+use Rconfig\Zabbix\Resources\MFAs;
+use Rconfig\Zabbix\Resources\Modules;
+use Rconfig\Zabbix\Resources\Problems;
+use Rconfig\Zabbix\Resources\Proxies;
+use Rconfig\Zabbix\Resources\ProxyGroups;
+use Rconfig\Zabbix\Resources\RegularExpressions;
+use Rconfig\Zabbix\Resources\Reports;
+use Rconfig\Zabbix\Resources\Roles;
+use Rconfig\Zabbix\Resources\Scripts;
+use Rconfig\Zabbix\Resources\Services;
+use Rconfig\Zabbix\Resources\Settings;
+use Rconfig\Zabbix\Resources\SLAs;
+use Rconfig\Zabbix\Resources\Tasks;
+use Rconfig\Zabbix\Resources\TemplateDashboards;
+use Rconfig\Zabbix\Resources\TemplateGroups;
+use Rconfig\Zabbix\Resources\Templates;
+use Rconfig\Zabbix\Resources\Tokens;
+use Rconfig\Zabbix\Resources\Trends;
+use Rconfig\Zabbix\Resources\TriggerPrototypes;
+use Rconfig\Zabbix\Resources\Triggers;
+use Rconfig\Zabbix\Resources\UserDirectories;
+use Rconfig\Zabbix\Resources\UserGroups;
+use Rconfig\Zabbix\Resources\UserMacros;
+use Rconfig\Zabbix\Resources\Users;
+use Rconfig\Zabbix\Resources\ValueMaps;
+use Rconfig\Zabbix\Resources\WebScenarios;
 
 class ZabbixConnector
 {
     /**
      * Get audit logs resource
      */
-    public function auditLogs(): \Rconfig\Zabbix\Resources\AuditLogs
+    public function auditLogs(): AuditLogs
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\AuditLogs($this->client);
+
+        return new AuditLogs($this->client);
     }
 
     /**
      * Get autoregistrations resource
      */
-    public function autoregistrations(): \Rconfig\Zabbix\Resources\Autoregistrations
+    public function autoregistrations(): Autoregistrations
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Autoregistrations($this->client);
+
+        return new Autoregistrations($this->client);
     }
 
     /**
      * Get configurations resource
      */
-    public function configurations(): \Rconfig\Zabbix\Resources\Configurations
+    public function configurations(): Configurations
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Configurations($this->client);
+
+        return new Configurations($this->client);
     }
 
     /**
      * Get correlations resource
      */
-    public function correlations(): \Rconfig\Zabbix\Resources\Correlations
+    public function correlations(): Correlations
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Correlations($this->client);
+
+        return new Correlations($this->client);
     }
 
     /**
      * Get discovered hosts resource
      */
-    public function discoveredHosts(): \Rconfig\Zabbix\Resources\DiscoveredHosts
+    public function discoveredHosts(): DiscoveredHosts
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\DiscoveredHosts($this->client);
+
+        return new DiscoveredHosts($this->client);
     }
 
     /**
      * Get discovered services resource
      */
-    public function discoveredServices(): \Rconfig\Zabbix\Resources\DiscoveredServices
+    public function discoveredServices(): DiscoveredServices
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\DiscoveredServices($this->client);
+
+        return new DiscoveredServices($this->client);
     }
 
     /**
      * Get high availability nodes resource
      */
-    public function highAvailabilityNodes(): \Rconfig\Zabbix\Resources\HighAvailabilityNodes
+    public function highAvailabilityNodes(): HighAvailabilityNodes
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\HighAvailabilityNodes($this->client);
+
+        return new HighAvailabilityNodes($this->client);
     }
 
     /**
      * Get histories resource
      */
-    public function histories(): \Rconfig\Zabbix\Resources\Histories
+    public function histories(): Histories
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Histories($this->client);
+
+        return new Histories($this->client);
     }
 
     /**
      * Get maintenances resource
      */
-    public function maintenances(): \Rconfig\Zabbix\Resources\Maintenances
+    public function maintenances(): Maintenances
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Maintenances($this->client);
+
+        return new Maintenances($this->client);
     }
 
     /**
      * Get problems resource
      */
-    public function problems(): \Rconfig\Zabbix\Resources\Problems
+    public function problems(): Problems
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Problems($this->client);
+
+        return new Problems($this->client);
     }
 
     /**
      * Get tokens resource
      */
-
-    public function tokens(): \Rconfig\Zabbix\Resources\Tokens
+    public function tokens(): Tokens
     {
         $this->ensureLoggedIn();
-        return new \Rconfig\Zabbix\Resources\Tokens($this->client);
+
+        return new Tokens($this->client);
     }
 
     // --- Properties ---
     protected ?ZabbixClient $client = null;
+
     protected ?string $baseUrl = null;
+
     protected ?string $endpoint = null;
+
     protected ?string $username = null;
+
     protected ?string $password = null;
+
     protected ?string $token = null;
+
     protected bool $isLoggedIn = false;
+
     // Additional options properties
     protected bool $debug = false;
+
     protected ?string $sslCaFile = null;
+
     protected int $sslVerifyPeer = 1;
+
     protected int $sslVerifyHost = 2;
+
     protected bool $useGzip = true;
+
     protected int $timeout = 30;
+
     protected int $connectTimeout = 30;
+
     protected int $retries = 2;
+
     protected int $retrySleepMs = 250;
 
     /**
@@ -169,7 +258,7 @@ class ZabbixConnector
 
         // Debug output after credentials are set
         if ($this->debug) {
-            dump("DBG login(). Using zabUser: " . ($this->username ?? 'N/A') . ", zabUrl: " . $this->baseUrl . "\n");
+            dump('DBG login(). Using zabUser: '.($this->username ?? 'N/A').', zabUrl: '.$this->baseUrl."\n");
             dump("DBG login(). Library Version: ZabbixConnector v1.0\n");
         }
 
@@ -194,7 +283,7 @@ class ZabbixConnector
             $this->apiVersion();
             $this->isLoggedIn = true;
         } catch (\Exception $e) {
-            throw new ZabbixException('Failed to connect to Zabbix API: ' . $e->getMessage(), previous: $e);
+            throw new ZabbixException('Failed to connect to Zabbix API: '.$e->getMessage(), previous: $e);
         }
 
         return $this;
@@ -357,531 +446,531 @@ class ZabbixConnector
     /**
      * Get hosts resource
      */
-    public function hosts(): \Rconfig\Zabbix\Resources\Hosts
+    public function hosts(): Hosts
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Hosts($this->client);
+        return new Hosts($this->client);
     }
 
     /**
      * Get host groups resource
      */
-    public function hostGroups(): \Rconfig\Zabbix\Resources\HostGroups
+    public function hostGroups(): HostGroups
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HostGroups($this->client);
+        return new HostGroups($this->client);
     }
 
     /**
      * Get items resource
      */
-    public function items(): \Rconfig\Zabbix\Resources\Items
+    public function items(): Items
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Items($this->client);
+        return new Items($this->client);
     }
 
     /**
      * Get templates resource
      */
-    public function templates(): \Rconfig\Zabbix\Resources\Templates
+    public function templates(): Templates
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Templates($this->client);
+        return new Templates($this->client);
     }
 
     /**
      * Get triggers resource
      */
-    public function triggers(): \Rconfig\Zabbix\Resources\Triggers
+    public function triggers(): Triggers
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Triggers($this->client);
+        return new Triggers($this->client);
     }
 
     /**
      * Get users resource
      */
-    public function users(): \Rconfig\Zabbix\Resources\Users
+    public function users(): Users
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Users($this->client);
+        return new Users($this->client);
     }
 
     /**
      * Get user groups resource
      */
-    public function userGroups(): \Rconfig\Zabbix\Resources\UserGroups
+    public function userGroups(): UserGroups
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\UserGroups($this->client);
+        return new UserGroups($this->client);
     }
 
     /**
      * Get actions resource
      */
-    public function actions(): \Rconfig\Zabbix\Resources\Actions
+    public function actions(): Actions
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Actions($this->client);
+        return new Actions($this->client);
     }
 
     /**
      * Get alerts resource
      */
-    public function alerts(): \Rconfig\Zabbix\Resources\Alerts
+    public function alerts(): Alerts
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Alerts($this->client);
+        return new Alerts($this->client);
     }
 
     /**
      * Get authentication resource
      */
-    public function authentication(): \Rconfig\Zabbix\Resources\Authentication
+    public function authentication(): Authentication
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Authentication($this->client);
+        return new Authentication($this->client);
     }
 
     /**
      * Get auto registration resource
      */
-    public function autoRegistration(): \Rconfig\Zabbix\Resources\AutoRegistration
+    public function autoRegistration(): AutoRegistration
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\AutoRegistration($this->client);
+        return new AutoRegistration($this->client);
     }
 
     /**
      * Get configuration resource
      */
-    public function configuration(): \Rconfig\Zabbix\Resources\Configuration
+    public function configuration(): Configuration
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Configuration($this->client);
+        return new Configuration($this->client);
     }
 
     /**
      * Get connectors resource
      */
-    public function connectors(): \Rconfig\Zabbix\Resources\Connectors
+    public function connectors(): Connectors
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Connectors($this->client);
+        return new Connectors($this->client);
     }
 
     /**
      * Get correlation resource
      */
-    public function correlation(): \Rconfig\Zabbix\Resources\Correlation
+    public function correlation(): Correlation
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Correlation($this->client);
+        return new Correlation($this->client);
     }
 
     /**
      * Get dashboards resource
      */
-    public function dashboards(): \Rconfig\Zabbix\Resources\Dashboards
+    public function dashboards(): Dashboards
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Dashboards($this->client);
+        return new Dashboards($this->client);
     }
 
     /**
      * Get discovery checks resource
      */
-    public function discoveryChecks(): \Rconfig\Zabbix\Resources\DiscoveryChecks
+    public function discoveryChecks(): DiscoveryChecks
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\DiscoveryChecks($this->client);
+        return new DiscoveryChecks($this->client);
     }
 
     /**
      * Get discovery rules resource
      */
-    public function discoveryRules(): \Rconfig\Zabbix\Resources\DiscoveryRules
+    public function discoveryRules(): DiscoveryRules
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\DiscoveryRules($this->client);
+        return new DiscoveryRules($this->client);
     }
 
     /**
      * Get events resource
      */
-    public function events(): \Rconfig\Zabbix\Resources\Events
+    public function events(): Events
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Events($this->client);
+        return new Events($this->client);
     }
 
     /**
      * Get graphs resource
      */
-    public function graphs(): \Rconfig\Zabbix\Resources\Graphs
+    public function graphs(): Graphs
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Graphs($this->client);
+        return new Graphs($this->client);
     }
 
     /**
      * Get graph items resource
      */
-    public function graphItems(): \Rconfig\Zabbix\Resources\GraphItems
+    public function graphItems(): GraphItems
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\GraphItems($this->client);
+        return new GraphItems($this->client);
     }
 
     /**
      * Get graph prototypes resource
      */
-    public function graphPrototypes(): \Rconfig\Zabbix\Resources\GraphPrototypes
+    public function graphPrototypes(): GraphPrototypes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\GraphPrototypes($this->client);
+        return new GraphPrototypes($this->client);
     }
 
     /**
      * GetHA nodes resource
      */
-    public function haNodes(): \Rconfig\Zabbix\Resources\HANodes
+    public function haNodes(): HANodes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HANodes($this->client);
+        return new HANodes($this->client);
     }
 
     /**
      * Get history resource
      */
-    public function history(): \Rconfig\Zabbix\Resources\History
+    public function history(): History
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\History($this->client);
+        return new History($this->client);
     }
 
     /**
      * Get host interfaces resource
      */
-    public function hostInterfaces(): \Rconfig\Zabbix\Resources\HostInterfaces
+    public function hostInterfaces(): HostInterfaces
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HostInterfaces($this->client);
+        return new HostInterfaces($this->client);
     }
 
     /**
      * Get host prototypes resource
      */
-    public function hostPrototypes(): \Rconfig\Zabbix\Resources\HostPrototypes
+    public function hostPrototypes(): HostPrototypes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\HostPrototypes($this->client);
+        return new HostPrototypes($this->client);
     }
 
     /**
      * Get housekeeping resource
      */
-    public function housekeeping(): \Rconfig\Zabbix\Resources\Housekeeping
+    public function housekeeping(): Housekeeping
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Housekeeping($this->client);
+        return new Housekeeping($this->client);
     }
 
     /**
      * Get icon maps resource
      */
-    public function iconMaps(): \Rconfig\Zabbix\Resources\IconMaps
+    public function iconMaps(): IconMaps
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\IconMaps($this->client);
+        return new IconMaps($this->client);
     }
 
     /**
      * Get images resource
      */
-    public function images(): \Rconfig\Zabbix\Resources\Images
+    public function images(): Images
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Images($this->client);
+        return new Images($this->client);
     }
 
     /**
      * Get item prototypes resource
      */
-    public function itemPrototypes(): \Rconfig\Zabbix\Resources\ItemPrototypes
+    public function itemPrototypes(): ItemPrototypes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\ItemPrototypes($this->client);
+        return new ItemPrototypes($this->client);
     }
 
     /**
      * Get LLD rules resource
      */
-    public function lldRules(): \Rconfig\Zabbix\Resources\LLDRules
+    public function lldRules(): LLDRules
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\LLDRules($this->client);
+        return new LLDRules($this->client);
     }
 
     /**
      * Get maintenance resource
      */
-    public function maintenance(): \Rconfig\Zabbix\Resources\Maintenance
+    public function maintenance(): Maintenance
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Maintenance($this->client);
+        return new Maintenance($this->client);
     }
 
     /**
      * Get maps resource
      */
-    public function maps(): \Rconfig\Zabbix\Resources\Maps
+    public function maps(): Maps
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Maps($this->client);
+        return new Maps($this->client);
     }
 
     /**
      * Get media types resource
      */
-    public function mediaTypes(): \Rconfig\Zabbix\Resources\MediaTypes
+    public function mediaTypes(): MediaTypes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\MediaTypes($this->client);
+        return new MediaTypes($this->client);
     }
 
     /**
      * Get MFAs resource
      */
-    public function mfas(): \Rconfig\Zabbix\Resources\MFAs
+    public function mfas(): MFAs
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\MFAs($this->client);
+        return new MFAs($this->client);
     }
 
     /**
      * Get modules resource
      */
-    public function modules(): \Rconfig\Zabbix\Resources\Modules
+    public function modules(): Modules
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Modules($this->client);
+        return new Modules($this->client);
     }
 
     /**
      * Get proxies resource
      */
-    public function proxies(): \Rconfig\Zabbix\Resources\Proxies
+    public function proxies(): Proxies
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Proxies($this->client);
+        return new Proxies($this->client);
     }
 
     /**
      * Get proxy groups resource
      */
-    public function proxyGroups(): \Rconfig\Zabbix\Resources\ProxyGroups
+    public function proxyGroups(): ProxyGroups
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\ProxyGroups($this->client);
+        return new ProxyGroups($this->client);
     }
 
     /**
      * Get regular expressions resource
      */
-    public function regularExpressions(): \Rconfig\Zabbix\Resources\RegularExpressions
+    public function regularExpressions(): RegularExpressions
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\RegularExpressions($this->client);
+        return new RegularExpressions($this->client);
     }
 
     /**
      * Get reports resource
      */
-    public function reports(): \Rconfig\Zabbix\Resources\Reports
+    public function reports(): Reports
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Reports($this->client);
+        return new Reports($this->client);
     }
 
     /**
      * Get roles resource
      */
-    public function roles(): \Rconfig\Zabbix\Resources\Roles
+    public function roles(): Roles
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Roles($this->client);
+        return new Roles($this->client);
     }
 
     /**
      * Get scripts resource
      */
-    public function scripts(): \Rconfig\Zabbix\Resources\Scripts
+    public function scripts(): Scripts
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Scripts($this->client);
+        return new Scripts($this->client);
     }
 
     /**
      * Get services resource
      */
-    public function services(): \Rconfig\Zabbix\Resources\Services
+    public function services(): Services
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Services($this->client);
+        return new Services($this->client);
     }
 
     /**
      * Get settings resource
      */
-    public function settings(): \Rconfig\Zabbix\Resources\Settings
+    public function settings(): Settings
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Settings($this->client);
+        return new Settings($this->client);
     }
 
     /**
      * Get SLAs resource
      */
-    public function slas(): \Rconfig\Zabbix\Resources\SLAs
+    public function slas(): SLAs
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\SLAs($this->client);
+        return new SLAs($this->client);
     }
 
     /**
      * Get tasks resource
      */
-    public function tasks(): \Rconfig\Zabbix\Resources\Tasks
+    public function tasks(): Tasks
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Tasks($this->client);
+        return new Tasks($this->client);
     }
 
     /**
      * Get template dashboards resource
      */
-    public function templateDashboards(): \Rconfig\Zabbix\Resources\TemplateDashboards
+    public function templateDashboards(): TemplateDashboards
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\TemplateDashboards($this->client);
+        return new TemplateDashboards($this->client);
     }
 
     /**
      * Get template groups resource
      */
-    public function templateGroups(): \Rconfig\Zabbix\Resources\TemplateGroups
+    public function templateGroups(): TemplateGroups
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\TemplateGroups($this->client);
+        return new TemplateGroups($this->client);
     }
 
     /**
      * Get trends resource
      */
-    public function trends(): \Rconfig\Zabbix\Resources\Trends
+    public function trends(): Trends
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\Trends($this->client);
+        return new Trends($this->client);
     }
 
     /**
      * Get trigger prototypes resource
      */
-    public function triggerPrototypes(): \Rconfig\Zabbix\Resources\TriggerPrototypes
+    public function triggerPrototypes(): TriggerPrototypes
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\TriggerPrototypes($this->client);
+        return new TriggerPrototypes($this->client);
     }
 
     /**
      * Get user directories resource
      */
-    public function userDirectories(): \Rconfig\Zabbix\Resources\UserDirectories
+    public function userDirectories(): UserDirectories
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\UserDirectories($this->client);
+        return new UserDirectories($this->client);
     }
 
     /**
      * Get user macros resource
      */
-    public function userMacros(): \Rconfig\Zabbix\Resources\UserMacros
+    public function userMacros(): UserMacros
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\UserMacros($this->client);
+        return new UserMacros($this->client);
     }
 
     /**
      * Get value maps resource
      */
-    public function valueMaps(): \Rconfig\Zabbix\Resources\ValueMaps
+    public function valueMaps(): ValueMaps
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\ValueMaps($this->client);
+        return new ValueMaps($this->client);
     }
 
     /**
      * Get web scenarios resource
      */
-    public function webScenarios(): \Rconfig\Zabbix\Resources\WebScenarios
+    public function webScenarios(): WebScenarios
     {
         $this->ensureLoggedIn();
 
-        return new \Rconfig\Zabbix\Resources\WebScenarios($this->client);
+        return new WebScenarios($this->client);
     }
 
     /**

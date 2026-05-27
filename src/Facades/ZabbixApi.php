@@ -3,6 +3,7 @@
 namespace Rconfig\Zabbix\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Rconfig\Zabbix\ZabbixConnector;
 
 /**
  * @method static \Rconfig\Zabbix\ZabbixConnector login(?string $baseUrl = null, ?string $username = null, ?string $password = null, array $options = [])
@@ -45,6 +46,6 @@ class ZabbixApi extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Rconfig\Zabbix\ZabbixConnector::class;
+        return ZabbixConnector::class;
     }
 }

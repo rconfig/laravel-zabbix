@@ -1,5 +1,6 @@
 <?php
 
+use Rconfig\Zabbix\Exceptions\ZabbixException;
 use Rconfig\Zabbix\Facades\ZabbixApi;
 use Rconfig\Zabbix\ZabbixConnector;
 
@@ -39,8 +40,8 @@ it('throws exception when not logged in', function () {
     $zabbix = new ZabbixConnector;
 
     // Should throw exception when trying to use API without login
-    expect(fn() => $zabbix->hosts())
-        ->toThrow(\Rconfig\Zabbix\Exceptions\ZabbixException::class, 'Not logged in');
+    expect(fn () => $zabbix->hosts())
+        ->toThrow(ZabbixException::class, 'Not logged in');
 });
 
 it('can logout', function () {
@@ -90,15 +91,15 @@ it('can login with debug enabled', function () {
 it('validates invalid options', function () {
     $options = ['invalidOption' => 'value'];
 
-    expect(fn() => ZabbixApi::login(null, null, null, $options))
-        ->toThrow(\Rconfig\Zabbix\Exceptions\ZabbixException::class, 'Invalid option used');
+    expect(fn () => ZabbixApi::login(null, null, null, $options))
+        ->toThrow(ZabbixException::class, 'Invalid option used');
 });
 
 it('validates ssl ca file exists', function () {
     $options = ['sslCaFile' => '/non/existent/file.crt'];
 
-    expect(fn() => ZabbixApi::login(null, null, null, $options))
-        ->toThrow(\Rconfig\Zabbix\Exceptions\ZabbixException::class, 'is not a valid file');
+    expect(fn () => ZabbixApi::login(null, null, null, $options))
+        ->toThrow(ZabbixException::class, 'is not a valid file');
 });
 
 it('can login with token via options', function () {

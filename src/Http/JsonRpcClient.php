@@ -3,15 +3,22 @@
 namespace Rconfig\Zabbix\Http;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Rconfig\Zabbix\Contracts\ZabbixClient;
+use Rconfig\Zabbix\Exceptions\ZabbixException;
+use Rconfig\Zabbix\Exceptions\ZabbixHttpException;
 
 class JsonRpcClient implements ZabbixClient
 {
     protected ?string $authToken = null;
+
     protected int $id = 1;
+
     protected ?string $apiVersion = null;
+
     protected ?bool $useAuthHeader = null; // null = not yet determined
+
     protected ?string $discoveredEndpoint = null; // The working endpoint we discovered
 
     public function __construct(
@@ -51,21 +58,21 @@ class JsonRpcClient implements ZabbixClient
             $this->ensureSessionToken($method);
 
             // Only add auth to body if we're NOT using header auth
-            if (!$this->useAuthHeader) {
+            if (! $this->useAuthHeader) {
                 $body['auth'] = $this->authToken;
             }
         }
 
         try {
             $res = $this->request($method, $needsAuth)->post($this->getFullEndpointUrl(), $body)->throw();
-        } catch (\Illuminate\Http\Client\RequestException $e) {
-            throw new \Rconfig\Zabbix\Exceptions\ZabbixHttpException($e->getMessage(), previous: $e);
+        } catch (RequestException $e) {
+            throw new ZabbixHttpException($e->getMessage(), previous: $e);
         }
 
         $data = $res->json();
 
         if (isset($data['error'])) {
-            throw new \Rconfig\Zabbix\Exceptions\ZabbixException(
+            throw new ZabbixException(
                 sprintf('[%s] %s', $data['error']['code'] ?? 'ERR', $data['error']['data'] ?? $data['error']['message'] ?? 'Unknown')
             );
         }
@@ -75,9 +82,10 @@ class JsonRpcClient implements ZabbixClient
 
     /**
      * Discover the correct Zabbix API endpoint by trying multiple variations
-     * 
+     *
      * @return string The working endpoint URL
-     * @throws \Rconfig\Zabbix\Exceptions\ZabbixException
+     *
+     * @throws ZabbixException
      */
     protected function discoverEndpoint(): string
     {
@@ -110,11 +118,13 @@ class JsonRpcClient implements ZabbixClient
                     // Valid Zabbix API response has jsonrpc and result/error
                     if (isset($data['jsonrpc']) && (isset($data['result']) || isset($data['error']))) {
                         $this->discoveredEndpoint = $testUrl;
+
                         return $testUrl;
                     }
                 }
             } catch (\Exception $e) {
                 $lastError = $e->getMessage();
+
                 // Continue to next endpoint
                 continue;
             }
@@ -122,17 +132,17 @@ class JsonRpcClient implements ZabbixClient
 
         // If we get here, none of the endpoints worked
         $triedUrls = implode("\n   - ", $possibleEndpoints);
-        throw new \Rconfig\Zabbix\Exceptions\ZabbixException(
-            "Could not discover Zabbix API endpoint. Tried the following URLs:\n   - {$triedUrls}\n\nLast error: {$lastError}\n\nPlease verify:\n" .
-                "1. The Zabbix URL is correct\n" .
-                "2. The server is accessible\n" .
-                "3. SSL certificates are valid (or disable SSL verification)"
+        throw new ZabbixException(
+            "Could not discover Zabbix API endpoint. Tried the following URLs:\n   - {$triedUrls}\n\nLast error: {$lastError}\n\nPlease verify:\n".
+                "1. The Zabbix URL is correct\n".
+                "2. The server is accessible\n".
+                '3. SSL certificates are valid (or disable SSL verification)'
         );
     }
 
     /**
      * Build a list of possible endpoint variations to try
-     * 
+     *
      * @return array List of full endpoint URLs to test
      */
     protected function buildEndpointVariations(): array
@@ -148,7 +158,7 @@ class JsonRpcClient implements ZabbixClient
         $path = $parsed['path'] ?? '';
 
         // Clean up the path
-        $path = '/' . trim($path, '/');
+        $path = '/'.trim($path, '/');
         if ($path === '/') {
             $path = '';
         }
@@ -163,32 +173,32 @@ class JsonRpcClient implements ZabbixClient
         }
 
         // 2. Modern Zabbix 7.2+ style: /api_jsonrpc.php at root (no /zabbix/)
-        if (!str_contains($path, '/zabbix')) {
-            $variations[] = $baseWithoutPath . $path . '/api_jsonrpc.php';
+        if (! str_contains($path, '/zabbix')) {
+            $variations[] = $baseWithoutPath.$path.'/api_jsonrpc.php';
         }
 
         // 3. Traditional: /zabbix/api_jsonrpc.php
-        $variations[] = $baseWithoutPath . '/zabbix/api_jsonrpc.php';
+        $variations[] = $baseWithoutPath.'/zabbix/api_jsonrpc.php';
 
         // 4. If user gave us a path other than /zabbix, try that with /api_jsonrpc.php
         if ($path && $path !== '/zabbix') {
-            $variations[] = $baseWithoutPath . $path . '/api_jsonrpc.php';
+            $variations[] = $baseWithoutPath.$path.'/api_jsonrpc.php';
         }
 
         // 5. Just /zabbix path on its own (some setups use this as the endpoint)
-        $variations[] = $baseWithoutPath . '/zabbix';
+        $variations[] = $baseWithoutPath.'/zabbix';
 
         // 6. Just in case: root level
-        $variations[] = $baseWithoutPath . '/api_jsonrpc.php';
+        $variations[] = $baseWithoutPath.'/api_jsonrpc.php';
 
         // 7. Custom path + /zabbix + endpoint (for subdirectory installs)
         if ($path && $path !== '/zabbix') {
-            $variations[] = $baseWithoutPath . $path . '/zabbix/api_jsonrpc.php';
+            $variations[] = $baseWithoutPath.$path.'/zabbix/api_jsonrpc.php';
         }
 
         // 8. Custom path + /zabbix on its own
         if ($path && $path !== '/zabbix') {
-            $variations[] = $baseWithoutPath . $path . '/zabbix';
+            $variations[] = $baseWithoutPath.$path.'/zabbix';
         }
 
         // Remove duplicates while preserving order
@@ -217,18 +227,18 @@ class JsonRpcClient implements ZabbixClient
 
             $this->apiVersion = $res['result'] ?? null;
 
-            if (!$this->apiVersion) {
-                throw new \Rconfig\Zabbix\Exceptions\ZabbixException('Failed to retrieve API version from Zabbix');
+            if (! $this->apiVersion) {
+                throw new ZabbixException('Failed to retrieve API version from Zabbix');
             }
 
             // Zabbix 6.4+ prefers Authorization header, 7.2+ requires it
             $this->useAuthHeader = version_compare($this->apiVersion, '6.4.0', '>=');
-        } catch (\Rconfig\Zabbix\Exceptions\ZabbixException $e) {
+        } catch (ZabbixException $e) {
             // Re-throw our own exceptions
             throw $e;
         } catch (\Exception $e) {
-            throw new \Rconfig\Zabbix\Exceptions\ZabbixException(
-                'Failed to detect Zabbix API version: ' . $e->getMessage()
+            throw new ZabbixException(
+                'Failed to detect Zabbix API version: '.$e->getMessage()
             );
         }
     }
@@ -239,7 +249,7 @@ class JsonRpcClient implements ZabbixClient
             ->retry($this->retries, $this->retrySleepMs);
 
         // Apply SSL options if provided
-        if (!empty($this->sslOptions)) {
+        if (! empty($this->sslOptions)) {
             $req = $req->withOptions($this->sslOptions);
         }
 
@@ -270,8 +280,8 @@ class JsonRpcClient implements ZabbixClient
         }
 
         // If we don't have credentials, we can't login
-        if (!$this->username || !$this->password) {
-            throw new \Rconfig\Zabbix\Exceptions\ZabbixException('Missing legacy credentials for authentication.');
+        if (! $this->username || ! $this->password) {
+            throw new ZabbixException('Missing legacy credentials for authentication.');
         }
 
         // Determine which parameter name to use based on API version
@@ -293,17 +303,17 @@ class JsonRpcClient implements ZabbixClient
             // user.login call should NOT carry Authorization header
             $res = $this->request($method, false)->post($this->getFullEndpointUrl(), $login)->throw()->json();
 
-            if (!isset($res['result'])) {
+            if (! isset($res['result'])) {
                 $errorMsg = isset($res['error'])
                     ? sprintf('[%s] %s', $res['error']['code'] ?? 'ERR', $res['error']['data'] ?? $res['error']['message'] ?? 'Unknown')
                     : 'No result returned from login';
-                throw new \Rconfig\Zabbix\Exceptions\ZabbixException('Unable to authenticate with legacy credentials: ' . $errorMsg);
+                throw new ZabbixException('Unable to authenticate with legacy credentials: '.$errorMsg);
             }
 
             $this->authToken = $res['result'];
-        } catch (\Illuminate\Http\Client\RequestException $e) {
-            throw new \Rconfig\Zabbix\Exceptions\ZabbixException(
-                'Unable to authenticate with legacy credentials. HTTP Error: ' . $e->getMessage()
+        } catch (RequestException $e) {
+            throw new ZabbixException(
+                'Unable to authenticate with legacy credentials. HTTP Error: '.$e->getMessage()
             );
         }
     }
@@ -316,6 +326,7 @@ class JsonRpcClient implements ZabbixClient
         if ($this->useAuthHeader === null) {
             $this->detectApiVersion();
         }
+
         return $this->apiVersion;
     }
 
@@ -324,9 +335,10 @@ class JsonRpcClient implements ZabbixClient
      */
     public function getFullEndpointUrl(): string
     {
-        if (!$this->discoveredEndpoint) {
+        if (! $this->discoveredEndpoint) {
             $this->discoverEndpoint();
         }
+
         return $this->discoveredEndpoint;
     }
 
