@@ -21,6 +21,10 @@ class TestCase extends Orchestra
         $app['config']->set('zabbix.endpoint', '/api_jsonrpc.php');
         $app['config']->set('zabbix.timeout', 5);
         $app['config']->set('zabbix.retries', 0);
+        // Add test credentials for ZabbixApi login
+        $app['config']->set('zabbix.token', 'test-token-123');
+        $app['config']->set('zabbix.username', 'test-user');
+        $app['config']->set('zabbix.password', 'test-password');
     }
 
     protected function setUp(): void
@@ -46,6 +50,14 @@ class TestCase extends Orchestra
 
                 // --- Core Resources ---
                 if ($method === 'host.get') {
+                    $params = $payload['params'] ?? [];
+
+                    // If countOutput is requested, return a count string
+                    if (isset($params['countOutput']) && $params['countOutput']) {
+                        return $ok('5');
+                    }
+
+                    // Otherwise return normal array
                     return $ok([[
                         'hostid' => '10106',
                         'host' => 'web-01',

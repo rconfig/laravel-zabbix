@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists user macros', function () {
-    $res = Zabbix::userMacros()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::userMacros()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

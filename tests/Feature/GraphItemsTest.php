@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists graph items', function () {
-    $res = Zabbix::graphItems()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::graphItems()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists maintenances', function () {
-    $m = Zabbix::maintenances()->get(['output' => 'extend', 'limit' => 5]);
+    ZabbixApi::login();
+    $m = ZabbixApi::maintenances()->get(['output' => 'extend', 'limit' => 5]);
     expect($m)->toBeArray();
 });

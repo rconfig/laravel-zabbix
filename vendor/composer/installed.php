@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'rconfig/laravel-zabbix',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => '1.0.2',
+        'version' => '1.0.2.0',
         'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
@@ -990,8 +990,8 @@
             'dev_requirement' => false,
         ),
         'rconfig/laravel-zabbix' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
             'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',

@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists item prototypes', function () {
-    $res = Zabbix::itemPrototypes()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::itemPrototypes()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('gets housekeeping', function () {
-    $res = Zabbix::housekeeping()->get([]);
+    ZabbixApi::login();
+    $res = ZabbixApi::housekeeping()->get([]);
     expect($res)->toBeArray();
 });

@@ -9,8 +9,9 @@ A Laravel-first, developer-friendly client for the [Zabbix JSON-RPC API](https:/
 
 ## ✨ Features
 
-- 🎯 **Fluent, Eloquent-style queries** for hosts and host groups
-- 🚀 **First-class developer experience** with expressive, chainable methods
+- 🎯 **Intuitive fluent API** with chainable query methods ending in `.get()`
+- 🚀 **First-class developer experience** with expressive, readable syntax  
+- ⚡ **No double method calls** - just chain directly: `hosts()->limit(5)->get()`
 - 🧪 **Local testing without a live Zabbix server** via HTTP fakes
 - 🔧 **Optional real server integration** for end-to-end testing
 - 📦 **Laravel package best practices** with auto-discovery
@@ -89,22 +90,29 @@ return [
 ## 🚀 Quick Start
 
 ```php
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Exceptions\UnsupportedOperationException;
 
-// Get API version
-$version = Zabbix::apiVersion(); // "7.0.0"
+// Connect with credentials
+$zabbix = ZabbixApi::login('https://zabbix.example.com', 'Admin', 'zabbix');
 
-// List all hosts
-$hosts = Zabbix::hosts()->all();
-
-// Find hosts with filters
-$activeLinux = Zabbix::hosts()->where([
-    'status' => 0, 
-    'name' => 'linux-server'
+// Or use API token (recommended)
+$zabbix = ZabbixApi::login('https://zabbix.example.com', null, null, [
+    'token' => 'your_api_token_here'
 ]);
 
+// Get API version
+$version = $zabbix->apiVersion(); // "7.0.0"
+
+// List all hosts
+$hosts = $zabbix->hosts()->all();
+
+// Find active Linux servers with fluent syntax
+$activeLinux = $zabbix->hosts()
+    ->where(['status' => 0, 'name' => 'linux-server'])
+    ->get();
+
 // Create a new host
-$newHost = Zabbix::hosts()->create([
+$newHost = $zabbix->hosts()->create([
     'host' => 'app-01',
     'interfaces' => [[
         'type' => 1, 'main' => 1, 'useip' => 1,
@@ -118,29 +126,51 @@ $newHost = Zabbix::hosts()->create([
 
 ## 🔍 Fluent Queries
 
-Build complex queries with an Eloquent-style fluent interface:
+Build complex queries with an intuitive fluent interface:
 
 ### Hosts
 
 ```php
-$hosts = Zabbix::hosts()->get(
-    Zabbix::hosts()->query()
+$zabbix = ZabbixApi::login($url, null, null, ['token' => $token]);
+
+// Simple fluent API - much cleaner!
+$hosts = $zabbix->hosts()
+    ->limit(50)
+    ->select(['hostid', 'host', 'status'])
+    ->withInterfaces()
+    ->withGroups()
+    ->where(['status' => 0])
+    ->sort('host')
+    ->get();
+
+// Get count of hosts
+$totalHosts = $zabbix->hosts()->count();
+// or
+$totalHosts = $zabbix->hosts()->countOnly()->get();
+```
+
+### Host Groups
+
+```php
+$groups = $zabbix->hostGroups()
+    ->limit(20)
+    ->select(['groupid', 'name'])
+    ->get();
+```
+
+### Advanced Query Builder (Alternative)
+
+For complex queries, you can still use the explicit query builder:
+
+```php
+$hosts = $zabbix->hosts()->get(
+    $zabbix->hosts()->query()
         ->select(['hostid', 'host', 'status'])
         ->withInterfaces()
         ->withGroups()
         ->where(['status' => 0])
         ->limit(50)
         ->sort('host')
-);
-```
-
-### Host Groups
-
-```php
-$groups = Zabbix::hostGroups()->get(
-    Zabbix::hostGroups()->query()
-        ->select(['groupid', 'name'])
-        ->limit(20)
 );
 ```
  
@@ -169,7 +199,7 @@ In these cases:
 Example:
 
 ```php
-use Rconfig\Zabbix\Exceptions\UnsupportedOperationException;
+use Rconfig\Zabbix\Exceptions\ZabbixException;
 
 try {
     Zabbix::apiinfo()->delete(['id' => 1]);
@@ -211,20 +241,57 @@ Zabbix::hosts()->get(['limit' => 'fifty']);
 
 For Zabbix 5.4+ with API tokens:
 
-```env
-ZABBIX_API_TOKEN=your_api_token_here
+```php
+$zabbix = ZabbixApi::login('https://zabbix.example.com', null, null, [
+    'token' => 'your_api_token_here'
+]);
 ```
 
 ### Username/Password
 
-Legacy authentication fallback:
+Legacy authentication:
+
+```php
+$zabbix = ZabbixApi::login('https://zabbix.example.com', 'Admin', 'zabbix');
+```
+
+### Advanced Options
+
+SSL and timeout configuration:
+
+```php
+$zabbix = ZabbixApi::login('https://zabbix.example.com', 'Admin', 'zabbix', [
+    // SSL options
+    'sslVerifyPeer' => false,
+    'sslVerifyHost' => false,
+    // Timeout settings
+    'timeout' => 30,
+    'connectTimeout' => 10,
+    // Debug and compression
+    'debug' => true,
+    'useGzip' => true
+]);
+```
+
+### Environment Configuration
+
+You can still use environment variables for default values:
 
 ```env
+ZABBIX_BASE_URL=https://zabbix.example.com
+ZABBIX_API_TOKEN=your_api_token_here
 ZABBIX_USERNAME=Admin
 ZABBIX_PASSWORD=zabbix
 ```
 
-The package automatically chooses the best authentication method available.
+Then use in your code:
+
+```php
+$zabbix = ZabbixApi::login([
+    'url' => config('zabbix.base_url'),
+    'token' => config('zabbix.token'),
+]);
+```
 
 ---
 
@@ -232,29 +299,28 @@ The package automatically chooses the best authentication method available.
 
 ### Fake Mode (Default)
 
-Perfect for local development and unit testing:
+Perfect for local development and unit testing - no real server needed:
 
-```env
-ZABBIX_FAKE_BY_DEFAULT=true
+```php
+// All calls return realistic mock data
+$zabbix = ZabbixApi::login('fake://localhost');
+$hosts = $zabbix->hosts()->all(); // Returns mock data
 ```
-
-All API calls return realistic mock data without needing a real Zabbix server.
 
 ### Integration Testing
 
 Test against a real Zabbix server:
 
-```env
-RUN_ZABBIX_INTEGRATION=1
-ZABBIX_BASE_URL=https://zabbix.example.com
-ZABBIX_API_TOKEN=your_token
+```php
+$zabbix = ZabbixApi::login($url, null, null, ['token' => $token]);
 ```
 
 ### Example Test
 
 ```php
 it('fetches hosts via fluent query', function () {
-    $hosts = Zabbix::hosts()->all();
+    $zabbix = ZabbixApi::login('fake://localhost');
+    $hosts = $zabbix->hosts()->all();
     expect($hosts)->toBeArray()->not->toBeEmpty();
 });
 ```
@@ -266,9 +332,11 @@ The package provides specific exceptions for different error types:
 ```php
 use Rconfig\Zabbix\Exceptions\ZabbixException;
 use Rconfig\Zabbix\Exceptions\ZabbixHttpException;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 try {
-    $hosts = Zabbix::hosts()->all();
+    $zabbix = ZabbixApi::login($url, null, null, ['token' => $token]);
+    $hosts = $zabbix->hosts()->all();
 } catch (ZabbixException $e) {
     // API-level errors (invalid params, auth issues, etc.)
     logger()->error('Zabbix API error: ' . $e->getMessage());
@@ -317,9 +385,10 @@ php artisan vendor:publish --tag=zabbix-config
 
 ```bash
 php artisan tinker
->>> use Rconfig\Zabbix\Facades\Zabbix;
->>> Zabbix::apiVersion()      // "7.0.0" (fake)
->>> Zabbix::hosts()->all()    // Mock data
+>>> use Rconfig\Zabbix\Facades\ZabbixApi;
+>>> $zabbix = ZabbixApi::login('fake://localhost');
+>>> $zabbix->apiVersion()      // "7.0.0" (fake)
+>>> $zabbix->hosts()->all()    // Mock data
 ```
 
 #### 4. Quick Test Route
@@ -327,9 +396,10 @@ php artisan tinker
 ```php
 // routes/web.php
 Route::get('/zabbix-test', function () {
+    $zabbix = ZabbixApi::login(['url' => 'fake://localhost']);
     return [
-        'version' => Zabbix::apiVersion(),
-        'hosts' => Zabbix::hosts()->all(5),
+        'version' => $zabbix->apiVersion(),
+        'hosts' => $zabbix->hosts()->all(5),
     ];
 });
 ```
@@ -443,7 +513,7 @@ While we aren't directly affiliated with Zabbix or Laravel, but we follow their 
 
 ## Authors
 
-This library is created by rConfig Developers.
+This library is created by rConfig Developers for the Zabbix and Laravel communities.
 
 ## License
 

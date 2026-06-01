@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists correlations', function () {
-    $res = Zabbix::correlations()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::correlations()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

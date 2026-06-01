@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists proxy groups', function () {
-    $res = Zabbix::proxyGroups()->get(['limit' => 1]);
+    ZabbixApi::login();
+    $res = ZabbixApi::proxyGroups()->get(['limit' => 1]);
     expect($res)->toBeArray();
 });

@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('lists users', function () {
-    $u = Zabbix::users()->get(['output' => ['userid', 'username']]);
+    ZabbixApi::login();
+    $u = ZabbixApi::users()->get(['output' => ['userid', 'username']]);
     expect($u)->toBeArray();
 });

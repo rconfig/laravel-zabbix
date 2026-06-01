@@ -2,7 +2,7 @@
 
 // tests/Feature/ParamValidationTest.php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 beforeEach(function () {
     // Enable validation for this test file regardless of .env
@@ -10,8 +10,9 @@ beforeEach(function () {
 });
 
 it('validates history.get parameter types', function () {
+    ZabbixApi::login();
     // itemids should be an array; history an int
-    expect(fn () => Zabbix::histories()->get([
+    expect(fn () => ZabbixApi::histories()->get([
         'itemids' => 'wrong',
         'history' => 'x',
         'limit' => 'nope',

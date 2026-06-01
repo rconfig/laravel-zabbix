@@ -1,8 +1,9 @@
 <?php
 
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('gets MFA settings', function () {
-    $res = Zabbix::mfas()->get([]);
+    ZabbixApi::login();
+    $res = ZabbixApi::mfas()->get([]);
     expect($res)->toBeArray();
 });

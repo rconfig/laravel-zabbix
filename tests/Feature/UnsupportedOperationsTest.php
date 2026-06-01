@@ -3,23 +3,25 @@
 // tests/Feature/UnsupportedOperationsTest.php
 
 use Rconfig\Zabbix\Exceptions\UnsupportedOperationException;
-use Rconfig\Zabbix\Facades\Zabbix;
+use Rconfig\Zabbix\Facades\ZabbixApi;
 
 it('prevents create/update/delete on histories', function () {
-    expect(fn () => Zabbix::histories()->create([]))
+    ZabbixApi::login();
+    expect(fn () => ZabbixApi::histories()->create([]))
         ->toThrow(UnsupportedOperationException::class);
 
-    expect(fn () => Zabbix::histories()->update([]))
+    expect(fn () => ZabbixApi::histories()->update([]))
         ->toThrow(UnsupportedOperationException::class);
 
-    expect(fn () => Zabbix::histories()->delete([]))
+    expect(fn () => ZabbixApi::histories()->delete([]))
         ->toThrow(UnsupportedOperationException::class);
 });
 
 it('prevents create/delete on settings', function () {
-    expect(fn () => Zabbix::settings()->create(['some' => 'value']))
+    ZabbixApi::login();
+    expect(fn () => ZabbixApi::settings()->create(['some' => 'value']))
         ->toThrow(UnsupportedOperationException::class);
 
-    expect(fn () => Zabbix::settings()->delete(['id']))
+    expect(fn () => ZabbixApi::settings()->delete(['id']))
         ->toThrow(UnsupportedOperationException::class);
 });
